@@ -12,6 +12,7 @@
 typedef struct {
     TIM_HandleTypeDef *pTIMHandle;
     USART_HandleTypeDef *pUSARTHandle;
+    RTC_HandleTypeDef *pRTCHandle;
 } System_Config_t;
 
 extern System_Config_t systemConfig;

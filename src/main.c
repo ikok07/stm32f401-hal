@@ -27,9 +27,15 @@ TIM_HandleTypeDef htim2 = {
     }
 };
 
+RTC_HandleTypeDef hrtc = {
+    .Instance = RTC,
+    .Init = {}      // Clock functionality is not needed
+};
+
 System_Config_t systemConfig = {
     .pTIMHandle = &htim2,
-    .pUSARTHandle = &husart1
+    .pUSARTHandle = &husart1,
+    .pRTCHandle = &hrtc
 };
 
 int __io_putchar(int ch) {
@@ -37,7 +43,7 @@ int __io_putchar(int ch) {
     return ch;
 }
 
-uint32_t prevCounter = -1;
+int32_t prevCounter = -1;
 uint32_t encoderValue = 0;
 
 int main(void) {
@@ -52,15 +58,22 @@ int main(void) {
     TIM_Encoder_InitTypeDef TIM_EncoderConfig = {
         .EncoderMode = TIM_ENCODERMODE_TI1,
 
-        .IC1Polarity = TIM_ICPOLARITY_RISING,
+        .IC1Polarity = TIM_ENCODERINPUTPOLARITY_RISING,
         .IC1Selection = TIM_ICSELECTION_INDIRECTTI,
         .IC1Prescaler = TIM_ICPSC_DIV1,
         .IC1Filter = 0x0F,
 
-        .IC2Polarity =  TIM_ICPOLARITY_RISING,
+        .IC2Polarity =  TIM_ENCODERINPUTPOLARITY_RISING,
         .IC2Selection = TIM_ICSELECTION_INDIRECTTI,
         .IC2Prescaler = TIM_ICPSC_DIV1,
         .IC2Filter = 0x0F
+    };
+
+    __HAL_RCC_PWR_CLK_ENABLE();
+
+    HAL_PWR_EnableBkUpAccess();
+    if (HAL_PWREx_EnableBkUpReg() != HAL_OK) {
+        while (1);
     };
 
     if (HAL_TIM_Encoder_Init(systemConfig.pTIMHandle, &TIM_EncoderConfig) != HAL_OK) {
@@ -71,6 +84,10 @@ int main(void) {
         while (1);
     };
 
+    encoderValue = HAL_RTCEx_BKUPRead(systemConfig.pRTCHandle, RTC_BKP_DR0);
+
+    printf("Saved encoder value: %ld\n", encoderValue);
+
     while (1);
 }
 
@@ -80,12 +97,17 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
         int16_t diff = counter - prevCounter;
 
         if (diff > (ENCODER_TIM_ARR_VALUE - 1) / 2) diff -= ENCODER_TIM_ARR_VALUE;
-        else if (diff < ENCODER_TIM_ARR_VALUE / 2) diff += ENCODER_TIM_ARR_VALUE;
+        else if (diff < -(ENCODER_TIM_ARR_VALUE / 2)) diff += ENCODER_TIM_ARR_VALUE;
 
         if (diff > 0) encoderValue++;
         else if (diff < 0) encoderValue--;
-
+        HAL_RTCEx_BKUPWrite(systemConfig.pRTCHandle, RTC_BKP_DR0, encoderValue);
         printf("Encoder value: %ld\n", encoderValue);
         prevCounter = counter;
     }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    encoderValue = 0;
+    printf("Encoder value reset to 0\n");
 }
