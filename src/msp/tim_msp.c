@@ -3,6 +3,7 @@
 //
 
 #include "stm32f4xx_hal.h"
+#include "system_config.h"
 
 void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {
@@ -32,8 +33,8 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef *htim) {
 
 
         // Enable interrupts
-        HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 1);
-        HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+        HAL_NVIC_SetPriority(EXTI2_IRQn, ENCODER_RESET_IRQ_PRIORITY, ENCODER_RESET_IRQ_PRIORITY);
+        HAL_NVIC_SetPriority(TIM2_IRQn, ENCODER_TIM_IRQ_PRIORITY, ENCODER_TIM_IRQ_PRIORITY);
         HAL_NVIC_EnableIRQ(EXTI2_IRQn);
         HAL_NVIC_EnableIRQ(TIM2_IRQn);
     }

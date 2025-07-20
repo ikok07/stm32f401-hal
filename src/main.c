@@ -3,7 +3,12 @@
 #include <stdlib.h>
 
 #include "stm32f4xx_hal.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "system_config.h"
+#include "tasks_config.h"
+#include "encoder_task.h"
 
 USART_HandleTypeDef husart1 = {
     .Instance = USART1,
@@ -42,9 +47,6 @@ int __io_putchar(int ch) {
     HAL_USART_Transmit(systemConfig.pUSARTHandle, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
-
-int32_t prevCounter = -1;
-uint32_t encoderValue = 0;
 
 int main(void) {
     if (HAL_Init() != HAL_OK) {
@@ -86,28 +88,12 @@ int main(void) {
 
     encoderValue = HAL_RTCEx_BKUPRead(systemConfig.pRTCHandle, RTC_BKP_DR0);
 
-    printf("Saved encoder value: %ld\n", encoderValue);
+    // Create encoder task
+    if (xTaskCreate(encoderTask, TASK_NAME_ENCODER, 100, NULL, TASK_PRIORITY_ENCODER, &encoderTaskHandle) != pdPASS) {
+        while (1);
+    };
+
+    vTaskStartScheduler();
 
     while (1);
-}
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM2) {
-        uint16_t counter = __HAL_TIM_GET_COUNTER(systemConfig.pTIMHandle);
-        int16_t diff = counter - prevCounter;
-
-        if (diff > (ENCODER_TIM_ARR_VALUE - 1) / 2) diff -= ENCODER_TIM_ARR_VALUE;
-        else if (diff < -(ENCODER_TIM_ARR_VALUE / 2)) diff += ENCODER_TIM_ARR_VALUE;
-
-        if (diff > 0) encoderValue++;
-        else if (diff < 0) encoderValue--;
-        HAL_RTCEx_BKUPWrite(systemConfig.pRTCHandle, RTC_BKP_DR0, encoderValue);
-        printf("Encoder value: %ld\n", encoderValue);
-        prevCounter = counter;
-    }
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    encoderValue = 0;
-    printf("Encoder value reset to 0\n");
 }

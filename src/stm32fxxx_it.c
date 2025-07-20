@@ -4,11 +4,6 @@
 
 #include "system_config.h"
 
-void SysTick_Handler() {
-    HAL_IncTick();
-    HAL_SYSTICK_IRQHandler();
-}
-
 void TIM2_IRQHandler () {
     HAL_TIM_IRQHandler(systemConfig.pTIMHandle);
 }

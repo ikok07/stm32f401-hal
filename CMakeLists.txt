@@ -48,23 +48,16 @@ set (RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
 file(GLOB_RECURSE APP_SOURCES
 		"src/*.c"
 		"src/*.s"
-		"lib/CMSIS/Device/ST/STM32F4xx/Src/*.c"
-		"startup_stm32f401ccux.s"
-)
-
-file(GLOB_RECURSE UTILS_SOURCES
+		"lib/CMSIS/*.c"
+		"lib/FreeRTOS/*.c"
+		"lib/HAL/*.c"
 		"utils/src/*.c"
-)
-
-file(GLOB_RECURSE HAL_SOURCES
-		"lib/HAL/Src/*.c"
+		"startup_stm32f401ccux.s"
 )
 
 set (PROJECT_SOURCES
 		# LIST SOURCE FILES HERE
 		${APP_SOURCES}
-		${UTILS_SOURCES}
-		${HAL_SOURCES}
 )
 
 set (PROJECT_DEFINES
@@ -75,11 +68,12 @@ set (PROJECT_DEFINES
 set (PROJECT_INCLUDES
 		# LIST INCLUDE DIRECTORIES HERE
     	include
-		drivers/inc
+		include/tasks
 		utils/inc
 		lib/CMSIS/Include
 		lib/CMSIS/Device/ST/STM32F4xx/Include
 		lib/HAL/Include
+		lib/FreeRTOS/Include
 )
 
 ############ MODIFY ACCORDING TO REQUIREMENTS) ########################

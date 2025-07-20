@@ -9,6 +9,9 @@
 
 #define ENCODER_TIM_ARR_VALUE               65536
 
+#define ENCODER_RESET_IRQ_PRIORITY           6
+#define ENCODER_TIM_IRQ_PRIORITY             6
+
 typedef struct {
     TIM_HandleTypeDef *pTIMHandle;
     USART_HandleTypeDef *pUSARTHandle;
@@ -16,5 +19,8 @@ typedef struct {
 } System_Config_t;
 
 extern System_Config_t systemConfig;
+
+extern int32_t prevCounter;
+extern uint32_t encoderValue;
 
 #endif //SYSTEM_CONFIG_H
