@@ -6,11 +6,18 @@
 #define SYSTEM_CONFIG_H
 
 #include "stm32f4xx_hal.h"
+#include "FreeRTOS.h"
+#include "stream_buffer.h"
+#include "message_buffer.h"
 
 #define ENCODER_TIM_ARR_VALUE               65536
 
+/* --------- IRQ Priorities --------- */
+
 #define ENCODER_RESET_IRQ_PRIORITY           6
 #define ENCODER_TIM_IRQ_PRIORITY             6
+
+
 
 typedef struct {
     TIM_HandleTypeDef *pTIMHandle;
@@ -18,9 +25,11 @@ typedef struct {
     RTC_HandleTypeDef *pRTCHandle;
 } System_Config_t;
 
-extern System_Config_t systemConfig;
+typedef struct {
+    MessageBufferHandle_t pPrintTaskMessageBuffer;
+} System_MessageBuffers_t;
 
-extern int32_t prevCounter;
-extern uint32_t encoderValue;
+extern System_Config_t systemConfig;
+extern System_MessageBuffers_t systemMessageBuffers;
 
 #endif //SYSTEM_CONFIG_H

@@ -11,6 +11,7 @@
 
 #include "system_config.h"
 #include "encoder_task.h"
+#include "print_task.h"
 
 int32_t prevCounter = -1;
 uint32_t encoderValue = 0;
@@ -47,5 +48,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     encoderValue = 0;
-    printf("Encoder value reset to 0\n");
+
+    // Send message
+    uint8_t msg[] = "Encoder value reset to 0\n";
+    printFromISR(msg, sizeof(msg));
 }

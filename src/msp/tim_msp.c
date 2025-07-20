@@ -3,7 +3,7 @@
 //
 
 #include "stm32f4xx_hal.h"
-#include "system_config.h"
+#include "../../include/config/system_config.h"
 
 void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {

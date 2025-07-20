@@ -69,6 +69,7 @@ set (PROJECT_INCLUDES
 		# LIST INCLUDE DIRECTORIES HERE
     	include
 		include/tasks
+		include/config
 		utils/inc
 		lib/CMSIS/Include
 		lib/CMSIS/Device/ST/STM32F4xx/Include

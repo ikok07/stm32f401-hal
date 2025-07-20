@@ -8,7 +8,11 @@
 
 #include "system_config.h"
 #include "tasks_config.h"
+#include "message_buffers_config.h"
+#include "encoder_config.h"
+
 #include "encoder_task.h"
+#include "print_task.h"
 
 USART_HandleTypeDef husart1 = {
     .Instance = USART1,
@@ -43,6 +47,8 @@ System_Config_t systemConfig = {
     .pRTCHandle = &hrtc
 };
 
+System_MessageBuffers_t systemMessageBuffers;
+
 int __io_putchar(int ch) {
     HAL_USART_Transmit(systemConfig.pUSARTHandle, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
     return ch;
@@ -57,39 +63,19 @@ int main(void) {
         while (1);
     }
 
-    TIM_Encoder_InitTypeDef TIM_EncoderConfig = {
-        .EncoderMode = TIM_ENCODERMODE_TI1,
+    // Create message buffers
+    systemMessageBuffers.pPrintTaskMessageBuffer = xMessageBufferCreate(MSG_BUFFER_SIZE_TASK_PRINT);
 
-        .IC1Polarity = TIM_ENCODERINPUTPOLARITY_RISING,
-        .IC1Selection = TIM_ICSELECTION_INDIRECTTI,
-        .IC1Prescaler = TIM_ICPSC_DIV1,
-        .IC1Filter = 0x0F,
-
-        .IC2Polarity =  TIM_ENCODERINPUTPOLARITY_RISING,
-        .IC2Selection = TIM_ICSELECTION_INDIRECTTI,
-        .IC2Prescaler = TIM_ICPSC_DIV1,
-        .IC2Filter = 0x0F
-    };
-
-    __HAL_RCC_PWR_CLK_ENABLE();
-
-    HAL_PWR_EnableBkUpAccess();
-    if (HAL_PWREx_EnableBkUpReg() != HAL_OK) {
-        while (1);
-    };
-
-    if (HAL_TIM_Encoder_Init(systemConfig.pTIMHandle, &TIM_EncoderConfig) != HAL_OK) {
-        while (1);
-    }
-
-    if (HAL_TIM_Encoder_Start_IT(systemConfig.pTIMHandle, TIM_CHANNEL_ALL) != HAL_OK) {
-        while (1);
-    };
-
-    encoderValue = HAL_RTCEx_BKUPRead(systemConfig.pRTCHandle, RTC_BKP_DR0);
+    // Initialize the encoder
+    EncoderConfig();
 
     // Create encoder task
-    if (xTaskCreate(encoderTask, TASK_NAME_ENCODER, 100, NULL, TASK_PRIORITY_ENCODER, &encoderTaskHandle) != pdPASS) {
+    if (xTaskCreate(encoderTask, TASK_NAME_ENCODER, 512, NULL, TASK_PRIORITY_ENCODER, &encoderTaskHandle) != pdPASS) {
+        while (1);
+    };
+
+    // Create print task
+    if (xTaskCreate(printTask, TASK_NAME_PRINT, 512, NULL, TASK_PRIORITY_PRINT, NULL) != pdPASS) {
         while (1);
     };
 
