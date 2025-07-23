@@ -15,3 +15,7 @@ void EXTI2_IRQHandler() {
 void USART1_IRQHandler() {
     HAL_USART_IRQHandler(systemConfig.pUSARTHandle);
 }
+
+void EXTI22_RTC_WKUP_IRQHandler() {
+    HAL_RTCEx_WakeUpTimerIRQHandler(systemConfig.pRTCHandle);
+}

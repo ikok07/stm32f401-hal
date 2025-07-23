@@ -2,9 +2,6 @@
 // Created by Kok on 7/20/25.
 //
 
-#include "FreeRTOS.h"
-#include "stream_buffer.h"
-#include "message_buffer.h"
 #include "print_task.h"
 
 #include "system_config.h"
@@ -16,7 +13,7 @@
 /**
  * @brief Prints message via USART1. This is intended to be used for printing when inside ISR.
  */
-void printTask(void *pvParams) {
+void TASK_Print(void *pvParams) {
     uint8_t message[MSG_BUFFER_SIZE_TASK_PRINT];
 
     while (1) {

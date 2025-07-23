@@ -5,6 +5,6 @@
 #ifndef ENCODER_CONFIG_H
 #define ENCODER_CONFIG_H
 
-void EncoderConfig();
+void APP_ConfigureEncoder();
 
 #endif //ENCODER_CONFIG_H

@@ -6,7 +6,10 @@
 #define SYSTEM_CONFIG_H
 
 #include "stm32f4xx_hal.h"
+
 #include "FreeRTOS.h"
+#include "task.h"
+
 #include "stream_buffer.h"
 #include "message_buffer.h"
 
@@ -15,9 +18,13 @@
 /* --------- IRQ Priorities --------- */
 
 #define ENCODER_RESET_IRQ_PRIORITY           6
+#define ENCODER_RESET_IRQ_SUBPRIORITY        1
+
 #define ENCODER_TIM_IRQ_PRIORITY             6
+#define ENCODER_TIM_IRQ_SUBPRIORITY          0
 
-
+#define RTC_WKUP_IRQ_PRIORITY                5
+#define RTC_WKUP_IRQ_SUBPRIORITY             0
 
 typedef struct {
     TIM_HandleTypeDef *pTIMHandle;
@@ -29,7 +36,14 @@ typedef struct {
     MessageBufferHandle_t pPrintTaskMessageBuffer;
 } System_MessageBuffers_t;
 
+typedef  struct {
+    TaskHandle_t pPrintTask;
+    TaskHandle_t pRTCConfigTask;
+    TaskHandle_t pEncoderTask;
+} System_Tasks_t;
+
 extern System_Config_t systemConfig;
+extern System_Tasks_t systemTasks;
 extern System_MessageBuffers_t systemMessageBuffers;
 
 #endif //SYSTEM_CONFIG_H

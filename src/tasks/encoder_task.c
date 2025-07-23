@@ -6,19 +6,19 @@
 #include <stdint.h>
 
 #include "stm32f4xx_hal.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
 #include "system_config.h"
+
 #include "encoder_task.h"
 #include "print_task.h"
 
 int32_t prevCounter = -1;
 uint32_t encoderValue = 0;
 
-TaskHandle_t encoderTaskHandle;
-
-void encoderTask(void *pvParams) {
+void TASK_Encoder(void *pvParams) {
     printf("Saved encoder value: %ld\n", encoderValue);
 
     while (1) {
@@ -41,7 +41,7 @@ void encoderTask(void *pvParams) {
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {
         BaseType_t xHigherPriorityTestWoken = pdFALSE;
-        vTaskNotifyGiveFromISR(encoderTaskHandle, &xHigherPriorityTestWoken);
+        vTaskNotifyGiveFromISR(systemTasks.pEncoderTask, &xHigherPriorityTestWoken);
         portYIELD_FROM_ISR(xHigherPriorityTestWoken);
     }
 }

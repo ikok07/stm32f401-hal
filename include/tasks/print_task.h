@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-void printTask(void *pvParams);
+void TASK_Print(void *pvParams);
 void printFromISR(uint8_t *msg, uint32_t len);
 
 #endif //PRINT_TASK_H

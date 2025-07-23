@@ -4,11 +4,24 @@
 
 #include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
+#include "task.h"
 
 #include "system_config.h"
+#include "tasks_config.h"
 #include "encoder_task.h"
 
-void EncoderConfig() {
+TIM_HandleTypeDef htim2 = {
+    .Instance = TIM2,
+    .Init = {
+        .AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE,
+        .ClockDivision = TIM_CLOCKDIVISION_DIV1,
+        .CounterMode = TIM_COUNTERMODE_UP,
+        .Prescaler = 0x00,
+        .Period = ENCODER_TIM_ARR_VALUE - 1,
+    }
+};
+
+void APP_ConfigureEncoder() {
     TIM_Encoder_InitTypeDef TIM_EncoderConfig = {
         .EncoderMode = TIM_ENCODERMODE_TI1,
 
@@ -22,6 +35,8 @@ void EncoderConfig() {
         .IC2Prescaler = TIM_ICPSC_DIV1,
         .IC2Filter = 0x0F
     };
+
+    systemConfig.pTIMHandle = &htim2;
 
     __HAL_RCC_PWR_CLK_ENABLE();
 
@@ -39,4 +54,8 @@ void EncoderConfig() {
     };
 
     encoderValue = HAL_RTCEx_BKUPRead(systemConfig.pRTCHandle, RTC_BKP_DR0);
+
+    if (xTaskCreate(TASK_Encoder, TASK_NAME_ENCODER, 512, NULL, TASK_PRIORITY_ENCODER, &systemTasks.pEncoderTask) != pdPASS) {
+        while (1);
+    };
 }

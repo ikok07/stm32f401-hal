@@ -16,4 +16,3 @@ void HAL_Delay(uint32_t Delay) {
 void vApplicationTickHook(void) {
     HAL_IncTick();
 }
-
