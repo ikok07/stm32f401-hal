@@ -12,5 +12,5 @@
 
 void TASK_RTCConfig() {
     APP_ConfigureRTC();
-    vTaskDelete(systemTasks.pRTCConfigTask);
+    vTaskDelete(systemTasks.RTCConfigTask);
 }

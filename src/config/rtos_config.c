@@ -11,52 +11,19 @@
 
 #include "system_config.h"
 
-RTC_DateTypeDef rtcDate;
-RTC_TimeTypeDef rtcTime;
-time_t sleepStartTimestamp = 0;
-
-static time_t convert_to_timestamp(RTC_DateTypeDef *date, RTC_TimeTypeDef *time) {
-    struct tm timeinfo = {0};
-
-    timeinfo.tm_year = date->Year + 100;
-    timeinfo.tm_mon = date->Month - 1;
-    timeinfo.tm_mday = date->Date;
-    timeinfo.tm_hour = time->Hours;
-    timeinfo.tm_min = time->Minutes;
-    timeinfo.tm_sec = time->Seconds;
-
-    return mktime(&timeinfo);
-}
-
 void CONFIG_PreSleepProcessing(TickType_t xExpectedIdleTime) {
-    // Sleep time of less than 2ms is not handled
-    // if ((xExpectedIdleTime / configTICK_RATE_HZ) < 2) return;
+    // Sleep time of less than 1ms is not handled
+    if ((pdTICKS_TO_MS(xExpectedIdleTime) / 1000) < 1) return;
 
     // 1Hz -> LSE clock selected
-    // TODO: FIX INCORRECT COUNTER VALUE
-    if (HAL_RTCEx_SetWakeUpTimer_IT(systemConfig.pRTCHandle, xExpectedIdleTime / configTICK_RATE_HZ, RTC_WAKEUPCLOCK_RTCCLK_DIV2) != HAL_OK) return;
-
-    if (HAL_RTC_GetTime(systemConfig.pRTCHandle, &rtcTime, RTC_FORMAT_BIN) != HAL_OK) {
-        HAL_RTCEx_DeactivateWakeUpTimer(systemConfig.pRTCHandle);
-        return;
-    }
-    if (HAL_RTC_GetDate(systemConfig.pRTCHandle, &rtcDate, RTC_FORMAT_BIN) != HAL_OK) {
-        HAL_RTCEx_DeactivateWakeUpTimer(systemConfig.pRTCHandle);
-        return;
-    }
-
-    sleepStartTimestamp = convert_to_timestamp(&rtcDate, &rtcTime);
+    if (HAL_RTCEx_SetWakeUpTimer_IT(systemConfig.pRTCHandle, pdTICKS_TO_MS(xExpectedIdleTime) / 1000, RTC_WAKEUPCLOCK_CK_SPRE_16BITS) != HAL_OK) return;
 
     HAL_SuspendTick();
 }
 
-void CONFIG_PostSleepProcessing() {
+void CONFIG_PostSleepProcessing(TickType_t xExpectedIdleTime) {
     HAL_RTCEx_DeactivateWakeUpTimer(systemConfig.pRTCHandle);
     HAL_ResumeTick();
 
-    if (HAL_RTC_GetTime(systemConfig.pRTCHandle, &rtcTime, RTC_FORMAT_BIN) != HAL_OK) return;
-    if (HAL_RTC_GetDate(systemConfig.pRTCHandle, &rtcDate, RTC_FORMAT_BIN) != HAL_OK) return;
-
-    time_t currentTimestamp = convert_to_timestamp(&rtcDate, &rtcTime);
-    vTaskStepTick(pdMS_TO_TICKS((currentTimestamp - sleepStartTimestamp) * 1000));
+    vTaskStepTick(xExpectedIdleTime);
 }

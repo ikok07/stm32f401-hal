@@ -41,7 +41,7 @@ void APP_ConfigureUSART1() {
     // Create message buffers
     systemMessageBuffers.pPrintTaskMessageBuffer = xMessageBufferCreate(MSG_BUFFER_SIZE_TASK_PRINT);
 
-    if (xTaskCreate(TASK_Print, TASK_NAME_PRINT, 512, NULL, TASK_PRIORITY_PRINT, &systemTasks.pPrintTask) != pdPASS) {
+    if (xTaskCreate(TASK_Print, TASK_NAME_PRINT, 512, NULL, TASK_PRIORITY_PRINT, &systemTasks.PrintTask) != pdPASS) {
         while (1);
     };
 }

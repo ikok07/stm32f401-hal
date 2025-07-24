@@ -37,9 +37,9 @@ typedef struct {
 } System_MessageBuffers_t;
 
 typedef  struct {
-    TaskHandle_t pPrintTask;
-    TaskHandle_t pRTCConfigTask;
-    TaskHandle_t pEncoderTask;
+    TaskHandle_t PrintTask;
+    TaskHandle_t RTCConfigTask;
+    TaskHandle_t EncoderTask;
 } System_Tasks_t;
 
 extern System_Config_t systemConfig;

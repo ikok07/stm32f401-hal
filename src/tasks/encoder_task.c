@@ -41,7 +41,7 @@ void TASK_Encoder(void *pvParams) {
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {
         BaseType_t xHigherPriorityTestWoken = pdFALSE;
-        vTaskNotifyGiveFromISR(systemTasks.pEncoderTask, &xHigherPriorityTestWoken);
+        vTaskNotifyGiveFromISR(systemTasks.EncoderTask, &xHigherPriorityTestWoken);
         portYIELD_FROM_ISR(xHigherPriorityTestWoken);
     }
 }

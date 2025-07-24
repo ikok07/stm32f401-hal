@@ -9,6 +9,6 @@
 #include "task.h"
 
 void CONFIG_PreSleepProcessing(TickType_t xExpectedIdleTime);
-void CONFIG_PostSleepProcessing();
+void CONFIG_PostSleepProcessing(TickType_t xExpectedIdleTime);
 
 #endif //RTOS_CONFIG_H

@@ -17,7 +17,7 @@ RTC_HandleTypeDef hrtc = {
     .Instance = RTC,
     .Init = {
         .HourFormat = RTC_HOURFORMAT_24,
-        .SynchPrediv = 128 - 1,
+        .SynchPrediv = 256 - 1,
         .AsynchPrediv = 128 - 1,
         .OutPut = RTC_OUTPUT_DISABLE
     }
@@ -25,7 +25,7 @@ RTC_HandleTypeDef hrtc = {
 
 void APP_CreateRTCConfigTask() {
     systemConfig.pRTCHandle = &hrtc;
-    if (xTaskCreate(TASK_RTCConfig, TASK_NAME_ENCODER_RTC_CONF, 512, NULL, TASK_PRIORITY_RTC_CONF, &systemTasks.pRTCConfigTask) != pdPASS) {
+    if (xTaskCreate(TASK_RTCConfig, TASK_NAME_ENCODER_RTC_CONF, 512, NULL, TASK_PRIORITY_RTC_CONF, &systemTasks.RTCConfigTask) != pdPASS) {
         while (1);
     }
 }

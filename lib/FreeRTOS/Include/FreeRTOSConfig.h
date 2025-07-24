@@ -92,6 +92,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskSuspend			1
 #define INCLUDE_vTaskDelayUntil			1
 #define INCLUDE_vTaskDelay				1
+#define INCLUDE_xTaskGetHandle			1
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
@@ -130,6 +131,6 @@ standard names. */
 
 /** These methods run before and after the CPU enters into sleep mode */
 #define configPRE_SLEEP_PROCESSING(xExpectedIdleTime)					CONFIG_PreSleepProcessing(xExpectedIdleTime)
-#define configPOST_SLEEP_PROCESSING(x)									CONFIG_PostSleepProcessing()
+#define configPOST_SLEEP_PROCESSING(xExpectedIdleTime)					CONFIG_PostSleepProcessing(xExpectedIdleTime)
 
 #endif /* FREERTOS_CONFIG_H */

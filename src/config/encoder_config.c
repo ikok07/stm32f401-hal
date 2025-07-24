@@ -55,7 +55,7 @@ void APP_ConfigureEncoder() {
 
     encoderValue = HAL_RTCEx_BKUPRead(systemConfig.pRTCHandle, RTC_BKP_DR0);
 
-    if (xTaskCreate(TASK_Encoder, TASK_NAME_ENCODER, 512, NULL, TASK_PRIORITY_ENCODER, &systemTasks.pEncoderTask) != pdPASS) {
+    if (xTaskCreate(TASK_Encoder, TASK_NAME_ENCODER, 512, NULL, TASK_PRIORITY_ENCODER, &systemTasks.EncoderTask) != pdPASS) {
         while (1);
     };
 }
